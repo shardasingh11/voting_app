@@ -1,14 +1,30 @@
 const express = require('express');
 const router = express.Router();
 
-const User = require('./../models/User');
+const User = require('./../models/user');
 const {jwtAuthMiddleware, generateToken} = require('./../jwt');
 
 
+//create function to find user has admin role
+const findAdmin = async() => {
+    try{
+        const admin = await User.find({role: 'admin'});
+        console.log("Admin is exist already", admin);
+        if(admin) return true;
+
+    }catch(err){
+        return false;
+    }
+    
+    
+}
+
 //POST method to create signup page
 router.post('/signup', async (req, res) => {
-
+    
     try{
+
+        if(findAdmin()) return res.status(403).json({message: "Cann't signup as admin, admin already exist"});
         const data = req.body;
 
         //create a User document
